@@ -19,3 +19,11 @@
 1. **Tokenization**
 Tokenization replaces sensitive data like card numbers with meaningless tokens stored securely in a vault. Unlike encryption, tokens can’t be reversed without access to the vault. It’s commonly used in FinTech to reduce PCI-DSS scope and prevent data breaches.
 If the tokenization service is compromised, real sensitive data could be exposed. That’s why the vault must be isolated, encrypted, audited, and hardened with strict access controls, key separation, and zero-trust policies — treating it as a high-value target.
+2. **CSRF – Cross-Site Request Forgery**
+CSRF exploits the browser’s cookie-sharing behavior to perform unauthorized actions. Spring protects against it by generating a CSRF token that must be submitted with each state-changing request.
+3. **XSS**
+XSS allows attackers to inject JavaScript into your app. Prevent it by escaping user output, sanitizing rich content, and using Content-Security-Policy headers.
+4. **Security headers**
+Security headers are sent in HTTP responses to instruct the browser on how to handle your content securely — helping prevent XSS, clickjacking, insecure content loading, and more. They're simple to implement but provide powerful client-side protections.
+
+
