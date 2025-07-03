@@ -138,3 +138,57 @@ Track index bloat and unused space.
 | Full text search           | Use `GIN` index on `to_tsvector(...)`   |
 
 ---
+
+### **1. Will B-Tree index work for full-text search?**
+
+B-Tree indexes work only for prefix-based string matches like `LIKE 'abc%'`, where the string starts with a known value. However, they do **not** help with `LIKE '%abc%'` or full-text pattern searches that require tokenization and ranking. For proper full-text search, use a `FULLTEXT` index in MySQL or a `GIN` index with `to_tsvector()` in PostgreSQL.
+
+```sql
+-- PostgreSQL full-text index
+CREATE INDEX idx_post_content ON posts USING GIN (to_tsvector('english', post_content));
+```
+
+---
+
+### **2. How do you decide applying composite indexing? Is composite index better than two separate indexes?**
+
+Composite indexes are ideal when multiple columns are queried together in the same `WHERE`, `JOIN`, or `ORDER BY` clause. A composite index like `(column1, column2)` helps if the query filters on `column1` or both columns together. However, it won’t help if only `column2` is used. Two separate indexes might work better if both columns are used independently across different queries.
+
+```sql
+CREATE INDEX idx_user_city ON users (country, city);
+-- Efficient for: WHERE country = 'PK' AND city = 'Lahore'
+```
+
+---
+
+### **3. If a column has almost unique values across rows but is not used in filtering/searching, should it be indexed?**
+
+No. Even if the column has high cardinality (mostly unique values), it should **not** be indexed unless it is actually involved in filtering, joining, or sorting in queries. Indexing it would consume disk space and slow down writes, without offering any performance benefit.
+
+---
+
+### **4. How can I remove useless indexes?**
+
+You can identify unused indexes by checking system statistics. In PostgreSQL, use `pg_stat_user_indexes` and look for `idx_scan = 0` to find indexes that were never used. In MySQL, monitor `SHOW INDEX` and review query patterns. Once confirmed, remove the unused index using a `DROP INDEX` statement.
+
+```sql
+-- PostgreSQL
+SELECT * FROM pg_stat_user_indexes WHERE idx_scan = 0;
+
+-- Drop index
+DROP INDEX idx_unused ON transactions;
+```
+
+---
+
+### **5. How do you fine-tune indexes?**
+
+Fine-tuning involves analyzing queries using `EXPLAIN ANALYZE` to ensure indexes are being used effectively. Prioritize indexing columns used in `WHERE`, `JOIN`, or `ORDER BY` with high selectivity. Consider composite indexes for multi-column filters, and avoid indexing low-cardinality or frequently updated columns. Regularly monitor index size, remove redundant indexes, and use covering indexes or partial indexes for complex scenarios.
+
+```sql
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 101;
+
+SELECT pg_size_pretty(pg_relation_size('idx_orders_customer_id'));
+```
+
+
