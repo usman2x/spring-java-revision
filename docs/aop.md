@@ -9,13 +9,14 @@ Instead of repeating the same logic in many places, you define it once in an **A
 
 
 
-| Term           | Meaning                                |
-| -------------- | -------------------------------------- |
-| **Aspect**     | Class with common logic (e.g. Logging) |
-| **Advice**     | Code that runs before/after a method   |
-| **Join Point** | Method execution point                 |
-| **Pointcut**   | Rule to match methods (e.g. by name)   |
-| **Weaving**    | Connecting advice to target methods    |
+| Concept    | Meaning                              | Example                          |
+| ---------- | ------------------------------------ | -------------------------------- |
+| Aspect     | Class with AOP logic                 | `LoggingAspect` class            |
+| Advice     | Code to run at join points           | `@Before`, `@After`, `@Around`   |
+| Join Point | Method call where advice can apply   | `JoinPoint joinPoint` param      |
+| Pointcut   | Expression that selects join points  | `execution(* com.service.*(..))` |
+| Weaving    | Applying aspect to the target method | Done via proxy (Spring AOP)      |
+
 
 
 ### Common Advice Types
